@@ -30,5 +30,6 @@ jobs:
       - name: run pipeline
         env:
           MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
         run: |
           dvc repro
