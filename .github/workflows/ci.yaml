@@ -1,16 +1,23 @@
 name: CI Pipeline
 
-on: push
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   project-testing:
     runs-on: ubuntu-latest
+    env:   # 👈 Secrets injected at job level
+      MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
+      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
 
     steps:
-      - name: checkout code
+      - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: setup python
+      - name: Set up Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.10'
@@ -23,16 +30,20 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: install dependencies
+      - name: Install dependencies
         run: |
+          pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: run pipeline
-        env:
-          MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
-          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+      - name: Debug env
+        run: |
+          echo "Username is $DAGSHUB_USERNAME"
+          echo "Token length is ${#MLOPS_TEST}"
+
+      - name: Run DVC pipeline
         run: |
           dvc repro
 
-
-
+      - name: Push DVC outputs to remote
+        run: |
+          dvc push
