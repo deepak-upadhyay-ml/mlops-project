@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request
 import numpy as np
+import os
 import mlflow
 import pickle
 import pandas as pd
@@ -90,15 +91,23 @@ def normalize_text(text):
 
 
 # ---------------- MLflow + DagsHub Setup ----------------
-mlflow.set_tracking_uri(
-    'https://dagshub.com/deepaku0222/mlops-project.mlflow'
-)
 
-dagshub.init(
-    repo_owner='deepaku0222',
-    repo_name='mlops-project',
-    mlflow=True
-)
+# Set up DagsHub credentials for MLflow tracking
+dagshub_token = os.getenv("MLOPS_TEST")
+if not dagshub_token:
+    raise EnvironmentError("MLOPS_TEST environment variable is not set")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
+
+dagshub_url = "https://dagshub.com"
+repo_owner = "deepaku0222"
+repo_name = "mlops-project"
+
+# Set up MLflow tracking URI
+mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
+# -------------------------------------------------------------------------------------
+
 
 # ---------------- Flask App ----------------
 app = Flask(__name__)
