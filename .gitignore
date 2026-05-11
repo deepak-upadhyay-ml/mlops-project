@@ -208,6 +208,11 @@ tempCodeRunnerFile.py
 
 # PyPI configuration file
 .pypirc
+cred.txt
+local_s3/
+
+data/
+models/
 
 # Marimo
 marimo/_static/

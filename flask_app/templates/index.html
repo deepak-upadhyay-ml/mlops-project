@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Sentiment Analysis App</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+
+            font-family: Arial, sans-serif;
+
+            height: 100vh;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(
+                135deg,
+                #74ebd5,
+                #ACB6E5
+            );
+
+            padding: 20px;
+        }
+
+        .container {
+
+            width: 100%;
+            max-width: 600px;
+
+            background: white;
+
+            padding: 35px;
+
+            border-radius: 15px;
+
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+
+            text-align: center;
+        }
+
+        h1 {
+
+            color: #333;
+
+            margin-bottom: 10px;
+
+            font-size: 32px;
+        }
+
+        p {
+
+            color: #666;
+
+            margin-bottom: 25px;
+
+            font-size: 16px;
+        }
+
+        textarea {
+
+            width: 100%;
+
+            padding: 15px;
+
+            border: 2px solid #ddd;
+
+            border-radius: 10px;
+
+            resize: none;
+
+            font-size: 16px;
+
+            outline: none;
+
+            transition: 0.3s;
+        }
+
+        textarea:focus {
+
+            border-color: #4CAF50;
+        }
+
+        button {
+
+            width: 100%;
+
+            margin-top: 20px;
+
+            padding: 14px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background: #4CAF50;
+
+            color: white;
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: 0.3s;
+        }
+
+        button:hover {
+
+            background: #43a047;
+
+            transform: scale(1.02);
+        }
+
+        .result {
+
+            margin-top: 25px;
+
+            padding: 18px;
+
+            border-radius: 12px;
+
+            font-size: 22px;
+
+            font-weight: bold;
+        }
+
+        .positive {
+
+            background-color: #d4edda;
+
+            color: #155724;
+
+            border: 2px solid #c3e6cb;
+        }
+
+        .negative {
+
+            background-color: #f8d7da;
+
+            color: #721c24;
+
+            border: 2px solid #f5c6cb;
+        }
+
+        footer {
+
+            margin-top: 20px;
+
+            color: #777;
+
+            font-size: 14px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🎭 Sentiment Analysis</h1>
+
+        <p>
+            Enter any sentence and check whether the sentiment is
+            Positive or Negative.
+        </p>
+
+        <form action="/predict" method="POST">
+
+            <textarea
+                name="text"
+                rows="6"
+                placeholder="Type your sentence here..."
+                required
+            ></textarea>
+
+            <button type="submit">
+                Predict Sentiment
+            </button>
+
+        </form>
+
+        {% if result is not none %}
+
+            <div class="result {% if result == 0 %}positive{% else %}negative{% endif %}">
+                {% if result == 0 %}
+                    😊 Positive Sentiment
+                {% else %}
+                    😞 Negative Sentiment
+                {% endif %}
+
+            </div>
+
+        {% endif %}
+
+        <footer>
+            Built with Flask • MLflow • DagsHub • Prometheus
+        </footer>
+
+    </div>
+
+</body>
+
+</html>
