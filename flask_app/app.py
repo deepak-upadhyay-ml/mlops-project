@@ -97,7 +97,7 @@ dagshub_token = os.getenv("MLOPS_TEST")
 if not dagshub_token:
     raise EnvironmentError("MLOPS_TEST environment variable is not set")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_token
+os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("DAGSHUB_USERNAME")
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 dagshub_url = "https://dagshub.com"
