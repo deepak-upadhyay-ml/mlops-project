@@ -2,28 +2,22 @@ name: CI Pipeline
 
 on:
   push:
-    branches:
-      - main
-  pull_request:
 
 jobs:
   project-testing:
     runs-on: ubuntu-latest
-    env:   # 👈 Secrets injected at job level
-      MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
-      DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
       - name: Cache pip dependencies
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
@@ -32,18 +26,32 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install --upgrade pip
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Debug env
+      - name: Debug project structure
         run: |
-          echo "Username is $DAGSHUB_USERNAME"
-          echo "Token length is ${#MLOPS_TEST}"
+          pwd
+          ls -R
+          find . -name "model_evaluation.py"
 
-      - name: Run DVC pipeline
+      - name: Debug environment variables
+        env:
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
         run: |
-          dvc repro
+          echo "DAGSHUB_USERNAME=$DAGSHUB_USERNAME"
 
-      - name: Push DVC outputs to remote
+          if [ -n "$MLOPS_TEST" ]; then
+            echo "MLOPS_TEST is present"
+          else
+            echo "MLOPS_TEST is missing"
+            exit 1
+          fi
+
+      - name: Run DVC Pipeline
+        env:
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+          MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
         run: |
-          dvc push
+          dvc repro -v
