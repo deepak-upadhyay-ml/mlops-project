@@ -33,3 +33,10 @@ jobs:
           DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
         run: |
           dvc repro
+
+
+      - name: Debug env
+        run: |
+          echo "Username is $DAGSHUB_USERNAME"
+          echo "Token length is ${#MLOPS_TEST}"
+
