@@ -15,10 +15,15 @@ from src.logger import logging
 # -------------------------------------------------------------------------------------
 # Set up DagsHub credentials for MLflow tracking
 dagshub_token = os.getenv("MLOPS_TEST")
+dagshub_username = os.getenv("DAGSHUB_USERNAME")
+
 if not dagshub_token:
     raise EnvironmentError("MLOPS_TEST environment variable is not set")
 
-os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("DAGSHUB_USERNAME")
+if not dagshub_username:
+    raise EnvironmentError("DAGSHUB_USERNAME environment variable is not set")
+
+os.environ["MLFLOW_TRACKING_USERNAME"] = dagshub_username
 os.environ["MLFLOW_TRACKING_PASSWORD"] = dagshub_token
 
 dagshub_url = "https://dagshub.com"
