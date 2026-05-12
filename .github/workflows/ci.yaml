@@ -1,7 +1,7 @@
 name: CI Pipeline
 
 on:
-  push:
+  push
 
 jobs:
   project-testing:
@@ -9,15 +9,15 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v2
         with:
-          python-version: "3.10"
+          python-version: '3.10'
 
       - name: Cache pip dependencies
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
@@ -26,32 +26,34 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Debug project structure
-        run: |
-          pwd
-          ls -R
-          find . -name "model_evaluation.py"
-
-      - name: Debug environment variables
+      - name: Run DVC pipeline
         env:
-          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
           MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
         run: |
-          echo "DAGSHUB_USERNAME=$DAGSHUB_USERNAME"
+          dvc repro
 
-          if [ -n "$MLOPS_TEST" ]; then
-            echo "MLOPS_TEST is present"
-          else
-            echo "MLOPS_TEST is missing"
-            exit 1
-          fi
-
-      - name: Run DVC Pipeline
+      - name: Run model tests
         env:
-          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
           MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
         run: |
-          dvc repro -v
+          python -m unittest tests/test_model.py
+
+      - name: Promote model to production
+        if: success()
+        env:
+          MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+        run: |
+          python scripts/promote_model.py
+
+      - name: Run Flask app tests
+        if: success()
+        env:
+          MLOPS_TEST: ${{ secrets.MLOPS_TEST }}
+          DAGSHUB_USERNAME: ${{ secrets.DAGSHUB_USERNAME }}
+        run: |
+          python -m unittest tests/test_flask_app.py
