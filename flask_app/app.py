@@ -18,10 +18,7 @@ import re
 import dagshub
 import warnings
 
-# ---------------- NLTK Downloads ----------------
-nltk.download("wordnet")
-nltk.download("omw-1.4")
-nltk.download("stopwords")
+
 
 from nltk.corpus import wordnet, stopwords
 from nltk.stem import WordNetLemmatizer
@@ -112,6 +109,12 @@ repo_name = "mlops-project"
 # Set up MLflow tracking URI
 mlflow.set_tracking_uri(f'{dagshub_url}/{repo_owner}/{repo_name}.mlflow')
 # -------------------------------------------------------------------------------------
+
+#  Below code block is for local use
+#  -------------------------------------------------------------------------------------
+# mlflow.set_tracking_uri('https://dagshub.com/deepaku0222/mlops-project.mlflow')
+# dagshub.init(repo_owner='deepaku0222', repo_name='mlops-project', mlflow=True)
+# ----------------------------------------------------------------------------------------
 
 
 # ---------------- Flask App ----------------
